@@ -34,16 +34,18 @@
 
 <style>
 	.notification {
-		position: absolute;
+		position: fixed;
 		min-width: 135px;
 		max-width: 220px;
 		padding: 12px 16px;
 		border-radius: 12px;
 		right: -280px;
-		margin: 35px 10px;
-		background-color: var(--color-bg);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+		margin: 16px 10px;
+		background-color: var(--shell-menu-bg);
+		backdrop-filter: blur(var(--blur-hard)) saturate(1.5);
+		color: var(--color-text);
+		border: 1px solid var(--shell-border);
+		box-shadow: var(--shell-shadow);
 		display: flex;
 		align-items: center;
 		justify-content: center;
