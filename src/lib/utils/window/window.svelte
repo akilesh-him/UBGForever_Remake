@@ -24,7 +24,7 @@
 	let z = $state(1);
 	let minimizedStat = $state(false);
 	let rightSplit = $state(false);
-	let taskbarHeight = $state(40);
+	let taskbarHeight = $state(48);
 	let {
 		url,
 		name,
@@ -48,7 +48,7 @@
 	let offSety = 0;
 	let draggingState = $state(false);
 	let transition = $state(false);
-	const topBarrier = 25;
+	const topBarrier = 0;
 	//
 	//----- window drag logic -----
 	//
@@ -144,7 +144,7 @@
 	let maximizedStat = $state(false);
 	export async function updateTaskbarHeight() {
 		let x = await loadSetting('navbarsize', 0);
-		taskbarHeight = 40 + x;
+		taskbarHeight = 48 + x;
 	}
 	updateTaskbarHeight();
 	function maximizeWindow() {
@@ -305,7 +305,7 @@
 		const maxWidth = window.innerWidth - x;
 		const maxHeight = window.innerHeight - y;
 		const maxHeightBottom = window.innerHeight - y - taskbarHeight;
-		const maxHeightTop = 25;
+		const maxHeightTop = 0;
 		if (resizeType === 'right') {
 			width = Math.min(maxWidth, Math.max(400, startWidth + mouseXmove)) + 'px';
 		}
