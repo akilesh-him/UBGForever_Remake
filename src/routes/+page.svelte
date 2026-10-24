@@ -144,8 +144,10 @@
 		justify-content: center;
 		height: 100vh;
 		margin: 0;
-		background-color: var(--color-bg);
+				background: var(--shell-backdrop);
 	}
+
+	.hero {
 
 	.hero {
 		display: flex;
