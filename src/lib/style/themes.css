@@ -935,4 +935,126 @@
 	--color-scrollbar-track: #161616;
 	--color-scrollbar-thumb: #3a3a3a;
 	--color-scrollbar-thumb-hover: #545454;
+	
+/* Glass Dark - frosted dark panels with a blue accent */
+:root[data-theme='glass-dark'],
+[data-theme='glass-dark'] {
+	/* surfaces */
+	--color-bg: #00000000;
+	--color-surface: rgba(255, 255, 255, 0.04);
+	--color-surface-2: rgba(18, 21, 30, 0.62);
+	--color-surface-3: rgba(22, 26, 38, 0.5);
+	--color-chrome: rgba(14, 17, 26, 0.78);
+	--color-window: #00000000;
+	--color-white: #ffffff;
+	--color-black: #000000;
+	--color-glass: rgba(14, 17, 26, 0.55);
+	--color-scrim: rgba(0, 0, 0, 0.12);
+	--color-scrim-medium: rgba(0, 0, 0, 0.3);
+	--color-scrim-strong: rgba(0, 0, 0, 0.85);
+	/* text */
+	--color-text: #eef1f8;
+	--color-text-dark: #0b1220;
+	--color-text-muted: #b9c0d0;
+	--color-text-subtle: #8791a6;
+	/* borders */
+	--color-border: rgba(255, 255, 255, 0.09);
+	--color-border-strong: rgba(255, 255, 255, 0.2);
+	--color-border-hover: rgba(255, 255, 255, 0.4);
+	/* interactive overlays */
+	--overlay-hover: rgba(255, 255, 255, 0.07);
+	--overlay-hover-strong: rgba(255, 255, 255, 0.14);
+	--overlay-active: rgba(138, 180, 255, 0.35);
+	--overlay-indicator: rgba(255, 255, 255, 0.4);
+	--overlay-browser-tab: #2a3042;
+	/* status */
+	--color-danger: #ff6b62;
+	--color-danger-hover: rgba(232, 72, 62, 0.85);
+	--color-pin: #8ab4ff;
+	/* scrollbar */
+	--color-scrollbar-track: transparent;
+	--color-scrollbar-thumb: rgba(255, 255, 255, 0.22);
+	--color-scrollbar-thumb-hover: rgba(255, 255, 255, 0.36);
+	/* blur */
+	--blur-normal: 16px;
+	--blur-hard: 36px;
+	--blur-xhard: 56px;
+	/* shell */
+	--shell-bar-bg: rgba(16, 19, 29, 0.55);
+	--shell-menu-bg: rgba(20, 24, 36, 0.62);
+	--shell-border: rgba(255, 255, 255, 0.14);
+	--shell-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+	--shell-wallpaper-tint: linear-gradient(180deg, rgba(8, 10, 18, 0.18), rgba(8, 10, 18, 0.34));
+	--shell-desktop-text: #ffffff;
+	--shell-text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
+	--shell-backdrop:
+		radial-gradient(1200px 700px at 15% 10%, #26345e 0%, transparent 60%),
+		radial-gradient(900px 600px at 90% 90%, #3a2260 0%, transparent 60%), #0a0d16;
+	--tile-bg: rgba(255, 255, 255, 0.1);
+	--icon-filter: none;
+	--accent: #8ab4ff;
+	--accent-contrast: #0b1220;
+}
+
+/* Glass Light - frosted white panels with a blue accent.
+ * --color-white / --color-black are intentionally swapped here: the app uses
+ * them as "strong text" and "text on strong fill", which flips on light. */
+:root[data-theme='glass-light'],
+[data-theme='glass-light'] {
+	/* surfaces */
+	--color-bg: #00000000;
+	--color-surface: rgba(255, 255, 255, 0.35);
+	--color-surface-2: rgba(255, 255, 255, 0.6);
+	--color-surface-3: rgba(255, 255, 255, 0.55);
+	--color-chrome: rgba(255, 255, 255, 0.78);
+	--color-window: #00000000;
+	--color-white: #12151d;
+	--color-black: #ffffff;
+	--color-glass: rgba(255, 255, 255, 0.55);
+	--color-scrim: rgba(255, 255, 255, 0.12);
+	--color-scrim-medium: rgba(255, 255, 255, 0.35);
+	--color-scrim-strong: rgba(255, 255, 255, 0.85);
+	/* text */
+	--color-text: #14171f;
+	--color-text-dark: #ffffff;
+	--color-text-muted: #3c4456;
+	--color-text-subtle: #6a7387;
+	/* borders */
+	--color-border: rgba(20, 24, 36, 0.1);
+	--color-border-strong: rgba(20, 24, 36, 0.22);
+	--color-border-hover: rgba(20, 24, 36, 0.4);
+	/* interactive overlays */
+	--overlay-hover: rgba(20, 24, 36, 0.06);
+	--overlay-hover-strong: rgba(20, 24, 36, 0.12);
+	--overlay-active: rgba(47, 109, 246, 0.28);
+	--overlay-indicator: rgba(20, 24, 36, 0.42);
+	--overlay-browser-tab: #ffffff;
+	/* status */
+	--color-danger: #d93f36;
+	--color-danger-hover: rgba(217, 63, 54, 0.9);
+	--color-pin: #2f6df6;
+	/* scrollbar */
+	--color-scrollbar-track: transparent;
+	--color-scrollbar-thumb: rgba(20, 24, 36, 0.25);
+	--color-scrollbar-thumb-hover: rgba(20, 24, 36, 0.4);
+	/* blur */
+	--blur-normal: 16px;
+	--blur-hard: 36px;
+	--blur-xhard: 56px;
+	/* shell */
+	--shell-bar-bg: rgba(255, 255, 255, 0.55);
+	--shell-menu-bg: rgba(255, 255, 255, 0.68);
+	--shell-border: rgba(255, 255, 255, 0.7);
+	--shell-shadow: 0 20px 50px rgba(30, 40, 70, 0.28);
+	--shell-wallpaper-tint: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.22));
+	--shell-desktop-text: #ffffff;
+	--shell-text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
+	--shell-backdrop:
+		radial-gradient(1200px 700px at 15% 10%, #cfe0ff 0%, transparent 60%),
+		radial-gradient(900px 600px at 90% 90%, #e6d4ff 0%, transparent 60%), #eef2fb;
+	--tile-bg: rgba(24, 30, 48, 0.72);
+	--icon-filter: invert(1) brightness(0.25);
+	--accent: #2f6df6;
+	--accent-contrast: #ffffff;
+}
 }
