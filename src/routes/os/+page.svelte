@@ -21,12 +21,19 @@
 	import sp from '$lib/img/icons/nvidia.png';
 	import { get } from 'svelte/store';
 	import { applyStartupSettings } from '$lib/utils/cloak.js';
+	import { saveTheme } from '$lib/utils/theme.js';
 	import gsap from 'gsap';
 	import { Warp, LiquidMetal } from '@devmischief/shaders-svelte';
 	import { loadSetting, saveSetting, onSettingChange } from '$lib/utils/localspace.js';
 	import faviconFetch from 'favicon-fetch';
 	import { launchAds } from '$lib/utils/ads';
 
+	// Change this to rename the desktop branding (start menu).
+	const siteName = 'GalaxyV7';
+	let startOpen = $state(false);
+	let query = $state('');
+	let dateString = $state('');
+	let colorMode = $state('dark');
 	let activeButton = $state(null);
 	let menuOpen = $state(false);
 	let openMenuX = $state(0);
@@ -354,6 +361,37 @@
 	function closeMenu() {
 		menuOpen = false;
 		menuSender = null;
+		startOpen = false;
+	}
+
+	function toggleStart(e) {
+		e.stopPropagation();
+		menuOpen = false;
+		previewOpen = false;
+		query = '';
+		startOpen = !startOpen;
+	}
+
+	function launch(app) {
+		startOpen = false;
+		openWindow(app.url, app.name, app.height, app.width, app.top, app.left, app.id);
+	}
+
+	function readColorMode() {
+		colorMode = document.documentElement.dataset.theme === 'glass-light' ? 'light' : 'dark';
+	}
+
+	async function toggleColorMode() {
+		await saveTheme(colorMode === 'light' ? 'glass-dark' : 'glass-light');
+		readColorMode();
+	}
+
+	const filteredApps = $derived(
+		apps.filter((app) => String(app.name).toLowerCase().includes(query.trim().toLowerCase()))
+	);
+
+	function focusOnMount(node) {
+		node.focus();
 	}
 
 	const proxies = [
@@ -472,7 +510,8 @@
 	}
 	function updateTime() {
 		const now = new Date();
-		timeString = now.toLocaleTimeString();
+		timeString = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+		dateString = now.toLocaleDateString([], { month: 'short', day: 'numeric' });
 	}
 
 	onMount(async () => {
@@ -480,6 +519,12 @@
 		navSizeMulti = await loadSetting('navbarsize', 0);
 		customApps = await loadSetting('customApps', []);
 		hydrated = true;
+		readColorMode();
+		const themeWatcher = new MutationObserver(readColorMode);
+		themeWatcher.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ['data-theme']
+		});
 		updateTime();
 		const interval = setInterval(updateTime, 1000);
 		const unsubscribeBG = onSettingChange('bg', (value) => {
@@ -489,6 +534,7 @@
 			customApps = value ?? [];
 		});
 		return () => {
+			themeWatcher.disconnect();
 			clearInterval(interval);
 			unsubscribeBG();
 			unsubscribeApps();
@@ -523,28 +569,32 @@
 		);
 	}
 </script>
-
-<div class="topNav noSelect">
-	<div class="topLeft"><p onclick={openChangelogs} class="topNavText topNavHover">GalaxyV7</p></div>
-	<div class="topMiddle"></div>
-	<div class="topRight">
-		<div class="topButton" onclick={switchMode}>
-			<img src={y} alt="" />
-		</div>
-		<p>{timeString}</p>
-	</div>
-</div>
-<Notifications />
 <svelte:window
 	onclick={() => {
 		closeMenu();
 	}}
+	onblur={() => (startOpen = false)}
 	onkeydown={(e) => {
-		if (addOpen && e.key === 'Escape') closeAddApp();
+		if (e.key === 'Escape') {
+			if (addOpen) closeAddApp();
+			else startOpen = false;
+		}
 	}}
 />
 
-<div class="background" style="background-image: url({bgURL}); "></div>
+<Notifications />
+
+<div class="background" style="background-image: url({bgURL});"></div>
+<div class="wallpaperTint"></div>
+
+<div class="desktopIcons noSelect">
+	{#each baseApps as app (app.id)}
+		<button class="desktopIcon" ondblclick={() => launch(app)} onclick={(e) => e.stopPropagation()}>
+			<span class="tile"><img src={app.icon} alt="" /></span>
+			<span class="iconLabel">{app.name}</span>
+		</button>
+	{/each}
+</div>
 
 {#if menuOpen}
 	<div class="contextMenu" style="left: {openMenuX}px;" onclick={(e) => e.stopPropagation()}>
@@ -711,30 +761,148 @@
 		{/each}
 	</div>
 {/if}
-<div
-	class="nav"
-	style="	height: {40 + navSizeMulti}px; 
-	
-"
->
-	<div class="navResize" onmousedown={startNavResize}></div>
-	<div class="navStuff noSelect" oncontextmenu={(e) => openMenu(e, 'navBar')}>
-		{#each apps as app (app.id)}
-			<button
-				class="navButton"
-				{@attach animateNavButton}
-				class:active={isAppActive(app.id)}
-				class:hasMinimized={hasMinimizedWindow(app.id) || getAppWindows(app.id).length > 0}
-				onclick={() =>
-					openWindow(app.url, app.name, app.height, app.width, app.top, app.left, app.id)}
-				oncontextmenu={(e) =>
-					openMenu(e, 'apps', app.id, app.url, app.name, app.height, app.width, app.top, app.left)}
-				onmouseenter={(e) => hoverStart(e, app.id)}
-				onmouseleave={hoverEnd}
-			>
-				<img class="navIcon" src={app.icon} alt={app.name} />
+
+{#if startOpen}
+	<div
+		class="startMenu"
+		role="dialog"
+		aria-label="Start menu"
+		tabindex="-1"
+		onclick={(e) => e.stopPropagation()}
+		{@attach (node) => {
+			gsap.fromTo(
+				node,
+				{ y: 24, opacity: 0, scale: 0.98 },
+				{ y: 0, opacity: 1, scale: 1, duration: 0.22, ease: 'power3.out' }
+			);
+		}}
+	>
+		<div class="searchBox">
+			<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+				<circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+				<path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+			</svg>
+			<input
+				type="text"
+				placeholder="Search apps"
+				bind:value={query}
+				{@attach focusOnMount}
+				onkeydown={(e) => {
+					if (e.key === 'Enter' && filteredApps.length > 0) launch(filteredApps[0]);
+				}}
+			/>
+		</div>
+
+		<p class="startLabel">{query ? 'Results' : 'Apps'}</p>
+		<div class="startGrid">
+			{#each filteredApps as app (app.id)}
+				<button
+					class="startApp"
+					onclick={() => launch(app)}
+					oncontextmenu={(e) =>
+						openMenu(e, 'apps', app.id, app.url, app.name, app.height, app.width, app.top, app.left)}
+				>
+					<span class="tile"><img src={app.icon} alt="" /></span>
+					<span class="startAppName">{app.name}</span>
+				</button>
+			{:else}
+				<p class="emptyState">No apps match “{query}”</p>
+			{/each}
+		</div>
+
+		<div class="startFooter">
+			<button class="footerBrand" onclick={openChangelogs} title="Changelog">
+				<span class="brandDot"></span>
+				{siteName}
 			</button>
-		{/each}
+			<div class="footerActions">
+				<button class="footerBtn" onclick={openAddApp}>+ Add app</button>
+				<button class="footerBtn" onclick={switchMode}>Switch mode</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<div class="nav" style="--nav-h: {48 + navSizeMulti}px;">
+	<div class="navResize" onmousedown={startNavResize}></div>
+	<div class="navGrid noSelect" oncontextmenu={(e) => openMenu(e, 'navBar')}>
+		<div class="navSide"></div>
+
+		<div class="navStuff">
+			<button
+				class="startButton"
+				class:open={startOpen}
+				onclick={toggleStart}
+				aria-label="Start"
+				aria-expanded={startOpen}
+			>
+				<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+					<rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" />
+					<rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.75" />
+					<rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" opacity="0.75" />
+					<rect x="13" y="13" width="8" height="8" rx="2" fill="currentColor" opacity="0.5" />
+				</svg>
+			</button>
+			<span class="navDivider"></span>
+			{#each apps as app (app.id)}
+				<button
+					class="navButton"
+					{@attach animateNavButton}
+					class:active={isAppActive(app.id)}
+					class:hasMinimized={hasMinimizedWindow(app.id) || getAppWindows(app.id).length > 0}
+					title={app.name}
+					onclick={() =>
+						openWindow(app.url, app.name, app.height, app.width, app.top, app.left, app.id)}
+					oncontextmenu={(e) =>
+						openMenu(e, 'apps', app.id, app.url, app.name, app.height, app.width, app.top, app.left)}
+					onmouseenter={(e) => hoverStart(e, app.id)}
+					onmouseleave={hoverEnd}
+				>
+					<img class="navIcon" src={app.icon} alt={app.name} />
+				</button>
+			{/each}
+		</div>
+
+		<div class="navSide tray">
+			<button
+				class="trayButton"
+				onclick={(e) => {
+					e.stopPropagation();
+					toggleColorMode();
+				}}
+				aria-label="Toggle light and dark mode"
+				title={colorMode === 'light' ? 'Switch to dark' : 'Switch to light'}
+			>
+				{#if colorMode === 'light'}
+					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+						<path
+							d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linejoin="round"
+						/>
+					</svg>
+				{:else}
+					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+						<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+						<path
+							d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+						/>
+					</svg>
+				{/if}
+			</button>
+			<button class="trayButton" onclick={switchMode} aria-label="Switch mode" title="Switch mode">
+				<img src={y} alt="" />
+			</button>
+			<div class="clock">
+				<span class="clockTime">{timeString}</span>
+				<span class="clockDate">{dateString}</span>
+			</div>
+		</div>
 	</div>
 </div>
 
