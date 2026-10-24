@@ -45,7 +45,23 @@
 	--color-scrollbar-track: #161616;
 	--color-scrollbar-thumb: #3a3a3a;
 	--color-scrollbar-thumb-hover: #545454;
-
+	/* ===================== Desktop shell (taskbar, start menu, windows) =====================
+	 * Defaults derive from the active theme's tokens; glass-dark / glass-light override them. */
+	--blur-normal: 14px;
+	--blur-hard: 32px;
+	--blur-xhard: 48px;
+	--shell-bar-bg: color-mix(in srgb, var(--color-surface-3) 78%, transparent);
+	--shell-menu-bg: color-mix(in srgb, var(--color-surface-3) 86%, transparent);
+	--shell-border: var(--color-border-strong);
+	--shell-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+	--shell-wallpaper-tint: transparent;
+	--shell-desktop-text: #ffffff;
+	--shell-text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+	--shell-backdrop: var(--color-bg);
+	--tile-bg: color-mix(in srgb, var(--color-chrome) 80%, transparent);
+	--icon-filter: none;
+	--accent: var(--color-pin);
+	--accent-contrast: var(--color-text-dark);
 	/* ===================== Font families ===================== */
 	--font-family-body: fabrica, sans-serif; /* primary UI / body text */
 	--font-family-heading: nunito, sans-serif; /* headings */
