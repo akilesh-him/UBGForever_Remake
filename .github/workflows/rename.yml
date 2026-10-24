@@ -1,0 +1,60 @@
+name: Rename paths
+on: workflow_dispatch
+permissions:
+  contents: write
+env:
+  SITE_NAME: "UBGForever"
+jobs:
+  rename:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Rename folders and paths
+        run: |
+          git mv glass uv
+          git mv prism scramjet
+          git mv poly scramjet-legacy
+          git mv static/servy.js static/sw.js
+
+          FILES=$(grep -rIl --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.svelte-kit \
+            --exclude='*.bundle.js' --exclude='libby*.js' --exclude='prism.js' --exclude='polygon*.js' \
+            --exclude='glass.client.js' --exclude='*.lock' --exclude='package-lock.json' \
+            -e "/glass/" -e "/prism/" -e "/poly/" -e "/libby" -e "/charon/" -e "/lively/" -e "servy" \
+            index.js vite.config.js uv scramjet static src || true)
+
+          sed -i \
+            -e "s#/service/glass/#/service/#g" \
+            -e "s#/libbybutslightlyworse/#/epoxy/#g" \
+            -e "s#/libby/#/libcurl/#g" \
+            -e "s#/charon/#/baremux/#g" \
+            -e "s#/glass/#/uv/#g" \
+            -e "s#/prism/#/scramjet/#g" \
+            -e "s#/poly/#/scramjet-legacy/#g" \
+            -e "s#/lively/#/wisp/#g" \
+            -e "s#/servy\.js#/sw.js#g" \
+            $FILES
+
+          sed -i "s#Home - Classroom#${SITE_NAME}#; s#Updates - Classroom#Updates - ${SITE_NAME}#" \
+            src/routes/+layout.svelte src/routes/changelog/+page.svelte
+
+      - name: Commit to a new branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout -b rename-paths
+          git add -A
+          git commit -m "Rename paths to standard names, set own title"
+          git push origin rename-paths
+
+      - name: Leftover names (informational)
+        run: |
+          grep -rIn --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.svelte-kit \
+            --exclude='*.bundle.js' --exclude='*.lock' --exclude='package-lock.json' --exclude-dir=.git \
+            -e "glass" -e "prism" -e "lively" -e "servy" -e "charon" -e "libby" . | cut -c1-140 | head -40 || true
+
+      - name: Build check
+        run: |
+          bun i
+          bun run build
